@@ -16,6 +16,30 @@ function App() {
   );
 }
 
+const ProgressBar = ({ step }) => {
+  const steps = [
+    { id: 1, name: '메뉴 선택' },
+    { id: 2, name: '주문 확인' },
+    { id: 3, name: '결제' }
+  ];
+
+  return (
+    <div className="w-full bg-white py-2 px-4 border-b">
+      <div className="flex justify-between items-center">
+        {steps.map((s) => (
+          <div key={s.id} className="flex items-center">
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${step >= s.id ? 'bg-[#FFC915]' : 'bg-gray-200'}`}>
+              <span className="text-sm">{s.id}</span>
+            </div>
+            <span className={`ml-2 text-sm ${step >= s.id ? 'font-bold' : 'text-gray-500'}`}>{s.name}</span>
+            {s.id !== 3 && <div className={`w-12 h-0.5 mx-2 ${step > s.id ? 'bg-[#FFC915]' : 'bg-gray-200'}`} />}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const PaymentPage = () => {
   const navigate = useNavigate();
   const totalAmount = parseInt(localStorage.getItem('totalAmount') || '0');
@@ -38,6 +62,7 @@ const PaymentPage = () => {
 
         {/* 메인 콘텐츠 */}
         <div className="w-4/5 h-full bg-white flex flex-col">
+          <ProgressBar step={3} />
           {/* 결제 금액 */}
           <div className="p-6">
             <div className="bg-[#FFC915] rounded-2xl p-6 mb-8">
@@ -99,33 +124,44 @@ const CartPage = () => {
           </div>
         </div>
 
-        <div className="w-4/5 h-full bg-[#F5F5F5] p-4 flex flex-col">
-          <h2 className="text-xl font-bold mb-4">주문 내역</h2>
-          <div className="flex-1 bg-white rounded-lg p-4">
-            <div className="space-y-4">
-              {cartItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span>{item.name}</span>
-                    <span className="text-sm text-gray-500">x{item.quantity}</span>
+        <div className="w-4/5 h-full bg-[#F5F5F5] flex flex-col">
+          <ProgressBar step={2} />
+          <div className="flex-1 p-4">
+            <h2 className="text-xl font-bold mb-4">주문 내역</h2>
+            <div className="bg-white rounded-lg p-4 flex-1">
+              <div className="space-y-4">
+                {cartItems.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span>{item.name}</span>
+                      <span className="text-sm text-gray-500">x{item.quantity}</span>
+                    </div>
+                    <span>{(item.price * item.quantity).toLocaleString()}원</span>
                   </div>
-                  <span>{(item.price * item.quantity).toLocaleString()}원</span>
+                ))}
+              </div>
+              <div className="mt-8 pt-4 border-t border-gray-200">
+                <div className="flex justify-between items-center">
+                  <span className="font-bold">주문 금액</span>
+                  <span className="font-bold">{totalAmount.toLocaleString()}원</span>
                 </div>
-              ))}
-            </div>
-            <div className="mt-8 pt-4 border-t border-gray-200">
-              <div className="flex justify-between items-center">
-                <span className="font-bold">주문 금액</span>
-                <span className="font-bold">{totalAmount.toLocaleString()}원</span>
               </div>
             </div>
           </div>
-          <button
-            className="w-full h-12 mt-4 bg-[#FFC915] text-black font-bold rounded"
-            onClick={() => navigate("/payment")}
-          >
-            결제 하기
-          </button>
+          <div className="p-4 flex gap-4">
+            <button
+              className="flex-1 h-12 bg-[#FFC915] text-black font-bold rounded"
+              onClick={() => navigate(-1)}
+            >
+              이전으로
+            </button>
+            <button
+              className="flex-1 h-12 bg-[#FFC915] text-black font-bold rounded"
+              onClick={() => navigate("/payment")}
+            >
+              결제 하기
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -211,37 +247,43 @@ const MenuPage = () => {
           </div>
         </div>
 
-        <div className="w-4/5 h-full bg-[#F5F5F5] p-4 overflow-y-auto relative">
-          {selectedCategory && (
-            <div className="grid grid-cols-2 gap-4 mb-20">
-              {selectedCategory.products.map((product) => (
-                <div
-                  key={product.id}
-                  className="bg-white p-4 rounded-lg shadow cursor-pointer"
-                  onClick={() => addToCart(product)}
-                >
-                  <div className="text-center">
-                    <div className="text-xl mb-2">{product.name}</div>
-                    <div className="text-gray-600">{product.price.toLocaleString()}원</div>
-                    <div className="text-sm text-gray-500">{product.description}</div>
+        <div className="w-4/5 h-full bg-[#F5F5F5] flex flex-col">
+          <ProgressBar step={1} />
+          <div className="flex-1 p-4 overflow-y-auto">
+            {selectedCategory && (
+              <div className="grid grid-cols-2 gap-4">
+                {selectedCategory.products.map((product) => (
+                  <div
+                    key={product.id}
+                    className="bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => addToCart(product)}
+                  >
+                    <div className="text-center h-full flex flex-col justify-between">
+                      <div>
+                        <div className="text-lg font-bold mb-2">{product.name}</div>
+                        <div className="text-gray-600 font-bold mb-1">{product.price.toLocaleString()}원</div>
+                        <div className="text-sm text-gray-500">{product.description}</div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
           {cartItems.length > 0 && (
-            <button
-              className="absolute bottom-4 right-0 w-2/5 h-14 text-lg font-bold flex items-center justify-center gap-3 border border-black rounded-l-xl"
-              style={{ backgroundColor: "#FFC915", color: "#000000" }}
-              onClick={() => {
-                localStorage.setItem('cartItems', JSON.stringify(cartItems));
-                localStorage.setItem('totalAmount', getTotalAmount());
-                navigate("/cart");
-              }}
-            >
-              <img src="/shoppingcart.png" alt="장바구니" className="w-8 h-8" />
-              주문 확인
-            </button>
+            <div className="p-4 border-t border-gray-200 bg-white">
+              <button
+                className="w-full h-12 text-lg font-bold flex items-center justify-center gap-3 bg-[#FFC915] text-black rounded-lg"
+                onClick={() => {
+                  localStorage.setItem('cartItems', JSON.stringify(cartItems));
+                  localStorage.setItem('totalAmount', getTotalAmount());
+                  navigate("/cart");
+                }}
+              >
+                <img src="/shoppingcart.png" alt="장바구니" className="w-6 h-6" />
+                주문 확인 ({cartItems.reduce((sum, item) => sum + item.quantity, 0)}개)
+              </button>
+            </div>
           )}
         </div>
       </div>
