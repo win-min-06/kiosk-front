@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 
 function App() {
@@ -18,6 +18,7 @@ function App() {
 
 const PaymentPage = () => {
   const navigate = useNavigate();
+  const totalAmount = parseInt(localStorage.getItem('totalAmount') || '0');
   
   return (
     <div className="flex justify-center items-center w-screen h-screen bg-gray-200">
@@ -42,7 +43,7 @@ const PaymentPage = () => {
             <div className="bg-[#FFC915] rounded-2xl p-6 mb-8">
               <div className="text-center">
                 <div className="text-lg font-bold mb-1">총 결제금액</div>
-                <div className="text-2xl font-bold">₩7,200</div>
+                <div className="text-2xl font-bold">₩{totalAmount.toLocaleString()}</div>
               </div>
             </div>
 
@@ -80,34 +81,42 @@ const PaymentPage = () => {
 
 const CartPage = () => {
   const navigate = useNavigate();
+  const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+  const totalAmount = parseInt(localStorage.getItem('totalAmount') || '0');
   
   return (
     <div className="flex justify-center items-center w-screen h-screen bg-gray-200">
       <div className="w-[360px] h-[640px] flex">
-        <div className="w-1/5 h-full bg-[#FFC915]" />
+        <div className="w-1/5 h-full bg-[#FFC915] flex flex-col">
+          <div className="flex-1 flex flex-col justify-center">
+            <div className="h-5/29 text-[9px] bg-[#484848] flex flex-col justify-end items-center p-1 space-y-2 rounded-r-xl">
+              <button className="bg-white text-black font-bold">직원 호출</button>
+              <button className="bg-white text-black">기본 화면</button>
+              <p className="text-white text-[5px] text-xl mb-4 text-left w-full">
+                *지금은 AI 개인 맞춤형 화면입니다.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="w-4/5 h-full bg-[#F5F5F5] p-4 flex flex-col">
           <h2 className="text-xl font-bold mb-4">주문 내역</h2>
           <div className="flex-1 bg-white rounded-lg p-4">
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span>🍔</span>
-                  <span>빅맥</span>
+              {cartItems.map((item) => (
+                <div key={item.id} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span>{item.name}</span>
+                    <span className="text-sm text-gray-500">x{item.quantity}</span>
+                  </div>
+                  <span>{(item.price * item.quantity).toLocaleString()}원</span>
                 </div>
-                <span>5500원</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span>🍟</span>
-                  <span>후렌치 후라이</span>
-                </div>
-                <span>2800원</span>
-              </div>
+              ))}
             </div>
             <div className="mt-8 pt-4 border-t border-gray-200">
               <div className="flex justify-between items-center">
                 <span className="font-bold">주문 금액</span>
-                <span className="font-bold">7200원</span>
+                <span className="font-bold">{totalAmount.toLocaleString()}원</span>
               </div>
             </div>
           </div>
@@ -125,7 +134,13 @@ const CartPage = () => {
 
 const MenuPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // 페이지 로드 시 기본적으로 버거 카테고리(2) 불러오기
+    handleCategoryClick(2);
+  }, []);
 
   const handleCategoryClick = async (categoryId) => {
     try {
@@ -140,6 +155,24 @@ const MenuPage = () => {
     }
   };
 
+  const addToCart = (product) => {
+    setCartItems(prev => {
+      const existingItem = prev.find(item => item.id === product.id);
+      if (existingItem) {
+        return prev.map(item =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
+  };
+
+  const getTotalAmount = () => {
+    return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  };
+
   return (
     <div className="flex justify-center items-center w-screen h-screen bg-gray-200">
       <div className="w-[360px] h-[640px] flex">
@@ -151,19 +184,19 @@ const MenuPage = () => {
               </button>
               <button 
                 className="!bg-gray-500 text-white font-bold"
-                onClick={() => handleCategoryClick(1)}
+                onClick={() => handleCategoryClick(2)}
               >
                 🍔 버 거
               </button>
               <button 
                 className="!bg-gray-500 text-white font-bold"
-                onClick={() => handleCategoryClick(2)}
+                onClick={() => handleCategoryClick(3)}
               >
                 🍟 사이드
               </button>
               <button 
                 className="!bg-gray-500 text-white font-bold"
-                onClick={() => handleCategoryClick(3)}
+                onClick={() => handleCategoryClick(1)}
               >
                 🥤 음 료
               </button>
@@ -180,18 +213,36 @@ const MenuPage = () => {
 
         <div className="w-4/5 h-full bg-[#F5F5F5] p-4 overflow-y-auto relative">
           {selectedCategory && (
-            <div>
-              {JSON.stringify(selectedCategory)}
+            <div className="grid grid-cols-2 gap-4 mb-20">
+              {selectedCategory.products.map((product) => (
+                <div
+                  key={product.id}
+                  className="bg-white p-4 rounded-lg shadow cursor-pointer"
+                  onClick={() => addToCart(product)}
+                >
+                  <div className="text-center">
+                    <div className="text-xl mb-2">{product.name}</div>
+                    <div className="text-gray-600">{product.price.toLocaleString()}원</div>
+                    <div className="text-sm text-gray-500">{product.description}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
-          <button
-            className="absolute bottom-4 right-0 w-2/5 h-14 text-lg font-bold flex items-center justify-center gap-3 border border-black rounded-l-xl"
-            style={{ backgroundColor: "#FFC915", color: "#000000" }}
-            onClick={() => navigate("/cart")}
-          >
-            <img src="/shoppingcart.png" alt="장바구니" className="w-8 h-8" />
-            주문 확인
-          </button>
+          {cartItems.length > 0 && (
+            <button
+              className="absolute bottom-4 right-0 w-2/5 h-14 text-lg font-bold flex items-center justify-center gap-3 border border-black rounded-l-xl"
+              style={{ backgroundColor: "#FFC915", color: "#000000" }}
+              onClick={() => {
+                localStorage.setItem('cartItems', JSON.stringify(cartItems));
+                localStorage.setItem('totalAmount', getTotalAmount());
+                navigate("/cart");
+              }}
+            >
+              <img src="/shoppingcart.png" alt="장바구니" className="w-8 h-8" />
+              주문 확인
+            </button>
+          )}
         </div>
       </div>
     </div>
