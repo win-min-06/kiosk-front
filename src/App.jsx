@@ -170,13 +170,22 @@ const CartPage = () => {
 
 const MenuPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    const savedCartItems = localStorage.getItem('cartItems');
+    return savedCartItems ? JSON.parse(savedCartItems) : [];
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
     // 페이지 로드 시 기본적으로 버거 카테고리(2) 불러오기
     handleCategoryClick(2);
   }, []);
+
+  useEffect(() => {
+    // cartItems가 변경될 때마다 localStorage 업데이트
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    localStorage.setItem('totalAmount', getTotalAmount().toString());
+  }, [cartItems]);
 
   const handleCategoryClick = async (categoryId) => {
     try {
