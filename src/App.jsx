@@ -160,20 +160,20 @@ const CartPage = () => {
           <div className="p-4 flex flex-col gap-2">
             <div className="grid grid-cols-2 gap-2">
               <button
-                className="h-12 bg-white text-black font-bold rounded border border-gray-200"
+                className="h-12 bg-gray-500 text-black font-bold rounded"
                 onClick={() => navigate(-1)}
               >
                 이전으로
               </button>
               <button
-                className="h-12 bg-white text-black font-bold rounded border border-gray-200"
+                className="h-12 bg-red-500 text-black font-bold rounded"
                 onClick={clearCart}
               >
                 비우기
               </button>
             </div>
             <button
-              className="h-12 bg-white text-black font-bold rounded border border-gray-200"
+              className="h-12 bg-[#FFC915] text-black font-bold rounded"
               onClick={() => navigate("/payment")}
             >
               결제하기
