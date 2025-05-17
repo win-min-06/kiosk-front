@@ -106,8 +106,17 @@ const PaymentPage = () => {
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+  const [cartItems, setCartItems] = useState(() => {
+    return JSON.parse(localStorage.getItem('cartItems') || '[]');
+  });
   const totalAmount = parseInt(localStorage.getItem('totalAmount') || '0');
+
+  const clearCart = () => {
+    setCartItems([]);
+    localStorage.setItem('cartItems', '[]');
+    localStorage.setItem('totalAmount', '0');
+    navigate(-1);
+  };
   
   return (
     <div className="flex justify-center items-center w-screen h-screen bg-gray-200">
@@ -148,18 +157,26 @@ const CartPage = () => {
               </div>
             </div>
           </div>
-          <div className="p-4 flex gap-4">
+          <div className="p-4 flex flex-col gap-2">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                className="h-12 bg-white text-black font-bold rounded border border-gray-200"
+                onClick={() => navigate(-1)}
+              >
+                이전으로
+              </button>
+              <button
+                className="h-12 bg-white text-black font-bold rounded border border-gray-200"
+                onClick={clearCart}
+              >
+                비우기
+              </button>
+            </div>
             <button
-              className="flex-1 h-12 bg-[#FFC915] text-black font-bold rounded"
-              onClick={() => navigate(-1)}
-            >
-              이전으로
-            </button>
-            <button
-              className="flex-1 h-12 bg-[#FFC915] text-black font-bold rounded"
+              className="h-12 bg-white text-black font-bold rounded border border-gray-200"
               onClick={() => navigate("/payment")}
             >
-              결제 하기
+              결제하기
             </button>
           </div>
         </div>
@@ -269,9 +286,9 @@ const MenuPage = () => {
                   >
                     <div className="text-center h-full flex flex-col justify-between">
                       <div>
-                        <div className="text-lg font-bold mb-2">{product.name}</div>
-                        <div className="text-gray-600 font-bold mb-1">{product.price.toLocaleString()}원</div>
-                        <div className="text-sm text-gray-500">{product.description}</div>
+                        <div className="text-lg font-bold mb-2 text-[#2D2D2D]">{product.name}</div>
+                        <div className="text-[#FF9F1C] font-bold mb-1">{product.price.toLocaleString()}원</div>
+                        <div className="text-[#6B7280]">{product.description}</div>
                       </div>
                     </div>
                   </div>
