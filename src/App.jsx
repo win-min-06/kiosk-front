@@ -46,7 +46,7 @@ const PaymentPage = () => {
   
   return (
     <div className="flex justify-center items-center w-screen h-screen bg-gray-200">
-      <div className="w-[360px] h-[640px] flex">
+      <div className="w-[360px] h-[640px] flex kiosk-container">
         {/* 왼쪽 사이드바 - 시작 화면 스타일 */}
         <div className="w-1/5 h-full bg-[#FFC915] flex flex-col">
           <div className="flex-1 flex flex-col justify-center">
@@ -120,7 +120,7 @@ const CartPage = () => {
   
   return (
     <div className="flex justify-center items-center w-screen h-screen bg-gray-200">
-      <div className="w-[360px] h-[640px] flex">
+      <div className="w-[360px] h-[640px] flex kiosk-container">
         <div className="w-1/5 h-full bg-[#FFC915] flex flex-col">
           <div className="flex-1 flex flex-col justify-center">
             <div className="h-5/29 text-[9px] bg-[#484848] flex flex-col justify-end items-center p-1 space-y-2 rounded-r-xl">
@@ -237,7 +237,7 @@ const MenuPage = () => {
 
   return (
     <div className="flex justify-center items-center w-screen h-screen bg-gray-200">
-      <div className="w-[360px] h-[640px] flex">
+      <div className="w-[360px] h-[640px] flex kiosk-container">
         <div className="w-1/5 h-full bg-[#FFC915] flex flex-col justify-center">
           <div className="h-1/2 text-[9px] bg-[#484848] flex flex-col items-center p-1 space-y-2 rounded-r-xl">
             <div className="flex flex-col gap-2 mb-2">
@@ -322,7 +322,7 @@ const HomePage = () => {
 
   return (
     <div className="flex justify-center items-center w-screen h-screen bg-gray-200">
-      <div className="w-[360px] h-[640px] flex">
+      <div className="w-[360px] h-[640px] flex kiosk-container">
         <div className="w-1/5 h-full bg-[#FFC915] flex flex-col">
           <div className="flex-1 flex flex-col justify-center">
             <div className="h-5/29 text-[9px] bg-[#484848] flex flex-col justify-end items-center p-1 space-y-2 rounded-r-xl">
